@@ -127,4 +127,11 @@
 
     <!-- Padding on the end of the quick statusbar (not top-most statusbar) -->
     <dimen name="qs_header_end_padding">@dimen/status_bar_padding_end</dimen>
+
+    <!-- OxygenOS styled dismiss all button -->
+    <dimen name="dismiss_all_button_elevation">10dp</dimen>
+    <dimen name="dismiss_all_button_height">55dp</dimen>
+    <dimen name="dismiss_all_button_margin_bottom">35dp</dimen>
+    <dimen name="dismiss_all_button_width">55dp</dimen>
+    <dimen name="dismiss_all_fab_src_size">24dp</dimen>
 </resources>

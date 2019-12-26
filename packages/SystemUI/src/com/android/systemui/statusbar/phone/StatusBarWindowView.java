@@ -56,6 +56,7 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowInsetsController;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.view.FloatingActionMode;
@@ -122,6 +123,8 @@ public class StatusBarWindowView extends FrameLayout {
     private boolean mSuppressingWakeUpGesture;
 
     private boolean mDoubleTapEnabledNative;
+
+    private static ImageButton mDismissAllButton;
 
     private final GestureDetector.SimpleOnGestureListener mGestureListener =
             new GestureDetector.SimpleOnGestureListener() {
@@ -284,6 +287,13 @@ public class StatusBarWindowView extends FrameLayout {
         mNotificationPanel = findViewById(R.id.notification_panel);
         mBrightnessMirror = findViewById(R.id.brightness_mirror);
         mLockIcon = findViewById(R.id.lock_icon);
+        mDismissAllButton = (ImageButton) findViewById(R.id.clear_notifications);
+    }
+
+    public static void setDismissAllOnClickListener(OnClickListener listener) {
+        if (mDismissAllButton != null) {
+            mDismissAllButton.setOnClickListener(listener);
+        }
     }
 
     @Override
