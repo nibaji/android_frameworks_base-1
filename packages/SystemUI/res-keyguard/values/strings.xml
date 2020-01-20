@@ -420,5 +420,6 @@ number">%d</xliff:g> remaining attempts before SIM becomes permanently unusable.
     <string name="clock_title_mnml_box" translatable="false">MNML Box</string>
     <string name="clock_title_mnml_minimal" translatable="false">MNML Minimal</string>
     <string name="clock_title_spectrum" translatable="false">Spectrum</string>
+    <string name="clock_title_sneeky" translatable="false">Sneeky</string>
 
 </resources>
