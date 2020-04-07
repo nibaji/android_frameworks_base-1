@@ -117,4 +117,7 @@
 
     <!-- Bottom margin size when fingerprint in display is active -->
     <dimen name="keyguard_indication_margin_bottom_fingerprint_in_display">30dp</dimen>
+
+     <!-- Oroño clock -->
+     <dimen name="clock_oronos_outline_size">4dp</dimen>
 </resources>
