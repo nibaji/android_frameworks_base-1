@@ -363,6 +363,8 @@ public class DisplayPolicy {
     private int mForcingShowNavBarLayer;
     private boolean mForceShowSystemBars;
 
+    private boolean mShowImeSpace = true;
+
     /**
      * Force the display of system bars regardless of other settings.
      */
@@ -445,6 +447,9 @@ public class DisplayPolicy {
             ContentResolver resolver = mContext.getContentResolver();
             resolver.registerContentObserver(LineageSettings.System.getUriFor(
                     LineageSettings.System.FORCE_SHOW_NAVBAR), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_BAR_IME_SPACE), false, this,
                     UserHandle.USER_ALL);
 
             updateSettings();
@@ -654,6 +659,10 @@ public class DisplayPolicy {
         mForceNavbar = LineageSettings.System.getIntForUser(resolver,
                 LineageSettings.System.FORCE_SHOW_NAVBAR, mHasNavigationBar ? 1 : 0,
                 UserHandle.USER_CURRENT);
+
+        mShowImeSpace = Settings.System.getIntForUser(resolver,
+                Settings.System.NAVIGATION_BAR_IME_SPACE, 1,
+                UserHandle.USER_CURRENT) != 0;
     }
 
     private int getDisplayId() {
@@ -2796,11 +2805,11 @@ public class DisplayPolicy {
 
         // Height of the navigation bar frame when presented horizontally at bottom
         mNavigationBarFrameHeightForRotationDefault[portraitRotation] =
-        mNavigationBarFrameHeightForRotationDefault[upsideDownRotation] =
-                res.getDimensionPixelSize(R.dimen.navigation_bar_frame_height);
+        mNavigationBarFrameHeightForRotationDefault[upsideDownRotation] = mShowImeSpace ?
+                res.getDimensionPixelSize(R.dimen.navigation_bar_frame_height) : 0;
         mNavigationBarFrameHeightForRotationDefault[landscapeRotation] =
-        mNavigationBarFrameHeightForRotationDefault[seascapeRotation] =
-                res.getDimensionPixelSize(R.dimen.navigation_bar_frame_height_landscape);
+        mNavigationBarFrameHeightForRotationDefault[seascapeRotation] = mShowImeSpace ?
+                res.getDimensionPixelSize(R.dimen.navigation_bar_frame_height_landscape) : 0;
 
         // Width of the navigation bar when presented vertically along one side
         mNavigationBarWidthForRotationDefault[portraitRotation] =

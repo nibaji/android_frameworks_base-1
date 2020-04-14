@@ -45,6 +45,7 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.Region.Op;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
@@ -92,6 +93,8 @@ public class NavigationBarView extends FrameLayout implements
 
     public static final String NAVIGATION_BAR_MENU_ARROW_KEYS =
             "lineagesystem:" + LineageSettings.System.NAVIGATION_BAR_MENU_ARROW_KEYS;
+    public static final String NAVIGATION_BAR_IME_SPACE =
+            "system:" + Settings.System.NAVIGATION_BAR_IME_SPACE;
 
     // slippery nav bar when everything is disabled, e.g. during setup
     final static boolean SLIPPERY_WHEN_DISABLED = true;
@@ -162,6 +165,7 @@ public class NavigationBarView extends FrameLayout implements
     private ScreenPinningNotify mScreenPinningNotify;
 
     private boolean mShowCursorKeys;
+    private boolean mShowImeSpace = true;
 
     private int mBasePaddingBottom;
     private int mBasePaddingLeft;
@@ -1079,8 +1083,8 @@ public class NavigationBarView extends FrameLayout implements
                             com.android.internal.R.dimen.navigation_bar_height_landscape)
                     : getResources().getDimensionPixelSize(
                             com.android.internal.R.dimen.navigation_bar_height);
-            int frameHeight = getResources().getDimensionPixelSize(
-                    com.android.internal.R.dimen.navigation_bar_frame_height);
+            int frameHeight = mShowImeSpace ? getResources().getDimensionPixelSize(
+                    com.android.internal.R.dimen.navigation_bar_frame_height) : 0;
             mBarTransitions.setBackgroundFrame(new Rect(0, frameHeight - height, w, h));
         }
 
@@ -1164,6 +1168,7 @@ public class NavigationBarView extends FrameLayout implements
         onNavigationModeChanged(mNavBarMode);
         final TunerService tunerService = Dependency.get(TunerService.class);
         tunerService.addTunable(this, NAVIGATION_BAR_MENU_ARROW_KEYS);
+        tunerService.addTunable(this, NAVIGATION_BAR_IME_SPACE);
         setUpSwipeUpOnboarding(isQuickStepSwipeUpEnabled());
         if (mRotationButtonController != null) {
             mRotationButtonController.registerListeners();
@@ -1195,6 +1200,8 @@ public class NavigationBarView extends FrameLayout implements
         if (NAVIGATION_BAR_MENU_ARROW_KEYS.equals(key)) {
             mShowCursorKeys = TunerService.parseIntegerSwitch(newValue, false);
             setNavigationIconHints(mNavigationIconHints);
+        } else if (NAVIGATION_BAR_IME_SPACE.equals(key)) {
+            mShowImeSpace =  TunerService.parseIntegerSwitch(newValue, true);
         }
     }
 
