@@ -152,4 +152,13 @@ public class ThemeAccentUtils {
             e.printStackTrace();
         }
     }
+
+    // Set Display Cutout
+    public static void setNotchOverlay(IOverlayManager om, int userId, boolean enable) {
+        try {
+            om.setEnabled("com.android.overlay.hidenotch",
+                        enable, userId);
+        } catch (RemoteException e) {
+        }
+    }
 }

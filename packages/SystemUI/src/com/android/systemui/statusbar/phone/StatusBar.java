@@ -335,6 +335,8 @@ public class StatusBar extends SystemUI implements DemoMode,
             "system:" + Settings.System.QS_BACKGROUND_BLUR;
     private static final String BERRY_DARK_STYLE =
             "system:" + Settings.System.BERRY_DARK_STYLE;
++    public static final String SYSUI_DISPLAY_CUTOUT =
++            "system:" + Settings.System.SYSUI_DISPLAY_CUTOUT;
 
     private static final String BANNER_ACTION_CANCEL =
             "com.android.systemui.statusbar.banner_action_cancel";
@@ -544,6 +546,8 @@ public class StatusBar extends SystemUI implements DemoMode,
     private ImageView mQSBlurView;
     private boolean mQSBlurEnabled;
     private boolean mQSBlurred;
+
+    private boolean defaultNotchCutout, mShowNotchCutout;
 
     // XXX: gesture research
     private final GestureRecorder mGestureRec = DEBUG_GESTURES
@@ -787,6 +791,9 @@ public class StatusBar extends SystemUI implements DemoMode,
             mBubbleController.setExpandListener(mBubbleExpandListener);
         }
 
+        defaultNotchCutout =  mContext.getResources().getBoolean(
+                    com.android.internal.R.bool.config_fillMainBuiltInDisplayCutout);
+
         mOverlayManager = IOverlayManager.Stub.asInterface(
                 ServiceManager.getService(Context.OVERLAY_SERVICE));
         mUiModeManager = mContext.getSystemService(UiModeManager.class);
@@ -955,6 +962,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         tunerService.addTunable(this, SHOW_BACK_ARROW_GESTURE);
         tunerService.addTunable(this, QS_BACKGROUND_BLUR);
         tunerService.addTunable(this, BERRY_DARK_STYLE);
+        tunerService.addTunable(this, SYSUI_DISPLAY_CUTOUT);
     }
 
     // ================================================================================
@@ -5360,6 +5368,17 @@ public class StatusBar extends SystemUI implements DemoMode,
                 if (mDarkStyle != darkStyle) {
                     mDarkStyle = darkStyle;
                     updateTheme();
+                }
+                break;
+            case SYSUI_DISPLAY_CUTOUT:
+                boolean showNotchCutout =
+                        TunerService.parseIntegerSwitch(newValue, defaultNotchCutout);
+                if (mShowNotchCutout != showNotchCutout) {
+                    mShowNotchCutout = showNotchCutout;
+                    mUiOffloadThread.submit(() -> {
+                        ThemeAccentUtils.setNotchOverlay(mOverlayManager,
+                            mLockscreenUserManager.getCurrentUserId(), mShowNotchCutout);
+                    });
                 }
                 break;
             default:
