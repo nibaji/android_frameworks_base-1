@@ -480,4 +480,8 @@ public class Utils {
                 break;
         }
     }
+
+    public static boolean hasMotoFaceUnlock() {
+        return SystemProperties.getBoolean("ro.face.moto_unlock_service", false);
+    }
 }
