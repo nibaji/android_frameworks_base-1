@@ -381,6 +381,12 @@ public class ScreenDecorations extends SystemUI implements Tunable,
     }
 
     private void setupDecorations() {
+        // Get rid of all views to redraw with new layout params
+        if (mOverlay != null)
+            mWindowManager.removeView(mOverlay);
+        if (mBottomOverlay != null)
+            mWindowManager.removeView(mBottomOverlay);
+
         mCustomCutout = mContext.getResources().getBoolean(R.bool.config_customCutout);
         mOverlay = LayoutInflater.from(mContext)
                 .inflate(R.layout.rounded_corners, null);

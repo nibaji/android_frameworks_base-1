@@ -5295,6 +5295,18 @@ public final class Settings {
         public static final String SYSUI_DISPLAY_CUTOUT = "sysui_display_cutout";
 
         /**
+         * Control how to handle the display cutout
+         * @hide
+         */
+        public static final String DISPLAY_CUTOUT_MODE = "display_cutout_mode";
+
+        /**
+         * Control how to handle the display cutout
+         * @hide
+         */
+        public static final String STOCK_STATUSBAR_IN_HIDE = "stock_statusbar_in_hide";
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *

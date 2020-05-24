@@ -335,8 +335,12 @@ public class StatusBar extends SystemUI implements DemoMode,
             "system:" + Settings.System.QS_BACKGROUND_BLUR;
     private static final String BERRY_DARK_STYLE =
             "system:" + Settings.System.BERRY_DARK_STYLE;
-+    public static final String SYSUI_DISPLAY_CUTOUT =
-+            "system:" + Settings.System.SYSUI_DISPLAY_CUTOUT;
+    public static final String SYSUI_DISPLAY_CUTOUT =
+            "system:" + Settings.System.SYSUI_DISPLAY_CUTOUT;
+    public static final String DISPLAY_CUTOUT_MODE =
+            "system:" + Settings.System.DISPLAY_CUTOUT_MODE;
+    public static final String STOCK_STATUSBAR_IN_HIDE =
+            "system:" + Settings.System.STOCK_STATUSBAR_IN_HIDE;
 
     private static final String BANNER_ACTION_CANCEL =
             "com.android.systemui.statusbar.banner_action_cancel";
@@ -963,6 +967,8 @@ public class StatusBar extends SystemUI implements DemoMode,
         tunerService.addTunable(this, QS_BACKGROUND_BLUR);
         tunerService.addTunable(this, BERRY_DARK_STYLE);
         tunerService.addTunable(this, SYSUI_DISPLAY_CUTOUT);
+        tunerService.addTunable(this, DISPLAY_CUTOUT_MODE);
+        tunerService.addTunable(this, STOCK_STATUSBAR_IN_HIDE);
     }
 
     // ================================================================================
@@ -1028,6 +1034,7 @@ public class StatusBar extends SystemUI implements DemoMode,
                     if (mHeadsUpManager.hasPinnedHeadsUp()) {
                         mNotificationPanel.notifyBarPanelExpansionChanged();
                     }
+                    handleCutout();
                     mStatusBarView.setBouncerShowing(mBouncerShowing);
                     if (oldStatusBarView != null) {
                         float fraction = oldStatusBarView.getExpansionFraction();
@@ -5260,6 +5267,16 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
     }
 
+    private void handleCutout() {
+        final boolean hideCutoutMode = Settings.System.getIntForUser(mContext.getContentResolver(),
+                        Settings.System.DISPLAY_CUTOUT_MODE, 0, UserHandle.USER_CURRENT) == 2;
+        final boolean statusBarStock = Settings.System.getIntForUser(mContext.getContentResolver(),
+                        Settings.System.STOCK_STATUSBAR_IN_HIDE, 1, UserHandle.USER_CURRENT) == 1;
+        ThemeAccentUtils.setCutoutOverlay(mOverlayManager, mLockscreenUserManager.getCurrentUserId(), hideCutoutMode);
+        ThemeAccentUtils.setStatusBarStockOverlay(mOverlayManager, mLockscreenUserManager.getCurrentUserId(), 
+              hideCutoutMode && statusBarStock);
+    }
+
     @Override
     public void onTuningChanged(String key, String newValue) {
         switch (key) {
@@ -5376,10 +5393,21 @@ public class StatusBar extends SystemUI implements DemoMode,
                 if (mShowNotchCutout != showNotchCutout) {
                     mShowNotchCutout = showNotchCutout;
                     mUiOffloadThread.submit(() -> {
+                        // Overlay when enabled clears black patch, so reverse this
                         ThemeAccentUtils.setNotchOverlay(mOverlayManager,
-                            mLockscreenUserManager.getCurrentUserId(), mShowNotchCutout);
+                            mLockscreenUserManager.getCurrentUserId(), !mShowNotchCutout);
                     });
                 }
+                break;
+            case DISPLAY_CUTOUT_MODE:
+                mUiOffloadThread.submit(() -> {
+                    handleCutout();
+                });
+                break;
+            case STOCK_STATUSBAR_IN_HIDE:
+                mUiOffloadThread.submit(() -> {
+                    handleCutout();
+                });
                 break;
             default:
                 break;
