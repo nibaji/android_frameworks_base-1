@@ -87,6 +87,12 @@ public class OronosClockController implements ClockPlugin {
     private TimeZone mTimeZone;
 
     /**
+     * Custom color for the clock
+     */
+    private int mBackgroundColor;
+    private int mHighlightColor;
+
+    /**
      * Create a DefaultClockController instance.
      *
      * @param res Resources contains title and thumbnail.
@@ -117,6 +123,23 @@ public class OronosClockController implements ClockPlugin {
                     WallpaperManager.FLAG_SYSTEM);
             setColorPalette(sysColors.supportsDarkText(), sysColors.getColorPalette());
         }
+        GradientDrawable hourBg = (GradientDrawable) mHourClock.getBackground();
+        GradientDrawable minBg = (GradientDrawable) mMinuteClock.getBackground();
+        GradientDrawable dateBg = (GradientDrawable) mLongDate.getBackground();
+
+        // Things that needs to be tinted with the background color
+        mHourClock.setTextColor(mBackgroundColor);
+        minBg.setColor(mBackgroundColor);
+        dateBg.setColor(mBackgroundColor);
+
+        // Things that needs to be tinted with the highlighted color
+        hourBg.setColor(mHighlightColor);
+        minBg.setStroke(mResources.getDimensionPixelSize(R.dimen.clock_oronos_outline_size),
+                            mHighlightColor);
+        dateBg.setStroke(mResources.getDimensionPixelSize(R.dimen.clock_oronos_outline_size),
+                            mHighlightColor);
+        mMinuteClock.setTextColor(mHighlightColor);
+        mLongDate.setTextColor(mHighlightColor);
     }
 
     @Override
@@ -145,7 +168,7 @@ public class OronosClockController implements ClockPlugin {
     @Override
     public Bitmap getPreview(int width, int height) {
 
-        View previewView = mLayoutInflater.inflate(R.layout.oronos_clock, null);
+        View previewView = mLayoutInflater.inflate(R.layout.oronos_clock_preview, null);
         TextClock previewHourTime = previewView.findViewById(R.id.clockHr);
         TextClock previewMinuteTime = previewView.findViewById(R.id.clockMin);
         TextView previewDate = previewView.findViewById(R.id.longDate);
@@ -153,33 +176,32 @@ public class OronosClockController implements ClockPlugin {
         // Initialize state of plugin before generating preview.
         ColorExtractor.GradientColors colors = mColorExtractor.getColors(
                 WallpaperManager.FLAG_LOCK);
-        int[] palette = colors.getColorPalette();
-        if (palette == null) {
+        int[] paletteLS = colors.getColorPalette();
+        if (paletteLS != null) {
+            setColorPalette(colors.supportsDarkText(), colors.getColorPalette());
+        } else {
             ColorExtractor.GradientColors sysColors = mColorExtractor.getColors(
                     WallpaperManager.FLAG_SYSTEM);
-            palette = sysColors.getColorPalette();
+            setColorPalette(sysColors.supportsDarkText(), sysColors.getColorPalette());
         }
-
-        final int bgColor = palette[Math.max(0, palette.length - 11)];
-        final int hiColor = palette[Math.max(0, palette.length - 5)];
 
         GradientDrawable hourBg = (GradientDrawable) previewHourTime.getBackground();
         GradientDrawable minBg = (GradientDrawable) previewMinuteTime.getBackground();
         GradientDrawable dateBg = (GradientDrawable) previewDate.getBackground();
 
         // Things that needs to be tinted with the background color
-        previewHourTime.setTextColor(bgColor);
-        minBg.setColor(bgColor);
-        dateBg.setColor(bgColor);
+        previewHourTime.setTextColor(mBackgroundColor);
+        minBg.setColor(mBackgroundColor);
+        dateBg.setColor(mBackgroundColor);
 
         // Things that needs to be tinted with the highlighted color
-        hourBg.setColor(hiColor);
+        hourBg.setColor(mHighlightColor);
         minBg.setStroke(mResources.getDimensionPixelSize(R.dimen.clock_oronos_outline_size),
-                            hiColor);
+                            mHighlightColor);
         dateBg.setStroke(mResources.getDimensionPixelSize(R.dimen.clock_oronos_outline_size),
-                            hiColor);
-        previewMinuteTime.setTextColor(hiColor);
-        previewDate.setTextColor(hiColor);
+                            mHighlightColor);
+        previewMinuteTime.setTextColor(mHighlightColor);
+        previewDate.setTextColor(mHighlightColor);
 
         mTime.setTimeInMillis(System.currentTimeMillis());
         previewDate.setText(mResources.getString(R.string.date_long_title_today, mTime.getDisplayName(
@@ -217,26 +239,8 @@ public class OronosClockController implements ClockPlugin {
         if (colorPalette == null || colorPalette.length == 0) {
             return;
         }
-        final int backgroundColor = colorPalette[Math.max(0, colorPalette.length - 11)];
-        final int highlightColor = colorPalette[Math.max(0, colorPalette.length - 5)];
-
-        GradientDrawable hourBg = (GradientDrawable) mHourClock.getBackground();
-        GradientDrawable minBg = (GradientDrawable) mMinuteClock.getBackground();
-        GradientDrawable dateBg = (GradientDrawable) mLongDate.getBackground();
-
-        // Things that needs to be tinted with the background color
-        mHourClock.setTextColor(backgroundColor);
-        minBg.setColor(backgroundColor);
-        dateBg.setColor(backgroundColor);
-
-        // Things that needs to be tinted with the highlighted color
-        hourBg.setColor(highlightColor);
-        minBg.setStroke(mResources.getDimensionPixelSize(R.dimen.clock_oronos_outline_size),
-                            highlightColor);
-        dateBg.setStroke(mResources.getDimensionPixelSize(R.dimen.clock_oronos_outline_size),
-                            highlightColor);
-        mMinuteClock.setTextColor(highlightColor);
-        mLongDate.setTextColor(highlightColor);
+        mBackgroundColor = colorPalette[Math.max(0, colorPalette.length - 11)];
+        mHighlightColor = colorPalette[Math.max(0, colorPalette.length - 5)];
     }
 
     @Override
